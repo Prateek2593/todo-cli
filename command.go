@@ -9,11 +9,12 @@ import (
 )
 
 type CmdFlags struct {
-	Add    string
-	Delete int
-	Edit   string
-	Toggle int
-	List   bool
+	Add      string
+	Delete   int
+	Edit     string
+	Toggle   int
+	List     bool
+	Priority string
 }
 
 func NewCmdFlags() *CmdFlags {
@@ -24,6 +25,7 @@ func NewCmdFlags() *CmdFlags {
 	flag.IntVar(&cf.Delete, "del", -1, "Specify a todo by index to delete")
 	flag.IntVar(&cf.Toggle, "toggle", -1, "Specify a todo by index to toggle")
 	flag.BoolVar(&cf.List, "list", false, "List all todos")
+	flag.StringVar(&cf.Priority, "p", "medium", "Specify a priority for a todo")
 
 	flag.Parse()
 
@@ -36,7 +38,7 @@ func (cf *CmdFlags) Execute(todos *Todos) {
 	case cf.List:
 		todos.Print()
 	case cf.Add != "":
-		todos.Add(cf.Add)
+		todos.Add(cf.Add, cf.Priority)
 	case cf.Edit != "":
 		parts := strings.SplitN(cf.Edit, ":", 2)
 		if len(parts) != 2 {

@@ -23,6 +23,9 @@ func (s *Storage[T]) Save(data T) error {
 func (s *Storage[T]) Load(data *T) error {
 	fileData, err := os.ReadFile(s.FileName)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
 		return err
 	}
 	return json.Unmarshal(fileData, data)
