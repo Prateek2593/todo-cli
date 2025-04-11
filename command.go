@@ -16,6 +16,7 @@ type CmdFlags struct {
 	List     bool
 	Priority string
 	Sort     bool
+	Notes    string
 }
 
 func NewCmdFlags() *CmdFlags {
@@ -28,6 +29,7 @@ func NewCmdFlags() *CmdFlags {
 	flag.BoolVar(&cf.List, "list", false, "List all todos")
 	flag.StringVar(&cf.Priority, "p", "medium", "Specify a priority for a todo")
 	flag.BoolVar(&cf.Sort, "sort", false, "Sort todos by priority")
+	flag.StringVar(&cf.Notes, "notes", "", "Specify notes for a todo")
 
 	flag.Parse()
 
@@ -40,7 +42,7 @@ func (cf *CmdFlags) Execute(todos *Todos) {
 	case cf.List:
 		todos.Print(cf.Sort)
 	case cf.Add != "":
-		todos.Add(cf.Add, cf.Priority)
+		todos.Add(cf.Add, cf.Priority, cf.Notes)
 	case cf.Edit != "":
 		parts := strings.SplitN(cf.Edit, ":", 2)
 		if len(parts) != 2 {

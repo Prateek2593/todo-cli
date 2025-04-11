@@ -19,11 +19,12 @@ type Todo struct {
 	CreatedAt   time.Time
 	CompletedAt *time.Time
 	Priority    string
+	Notes       string
 }
 
 type Todos []Todo
 
-func (todos *Todos) Add(title string, priority string) {
+func (todos *Todos) Add(title string, priority string, notes string) {
 	validPriorities := map[string]bool{
 		"low":    true,
 		"medium": true,
@@ -39,6 +40,7 @@ func (todos *Todos) Add(title string, priority string) {
 		CompletedAt: nil,
 		CreatedAt:   time.Now(),
 		Priority:    priority,
+		Notes:       notes,
 	}
 	*todos = append(*todos, todo)
 }
@@ -103,7 +105,7 @@ func (todos *Todos) Print(sortByPriority bool) {
 	}
 	table := table.New(os.Stdout)
 	table.SetRowLines(false)
-	table.SetHeaders("Index", "Title", "Completed", "Created At", "Completed At", "Priority")
+	table.SetHeaders("Index", "Title", "Completed", "Created At", "Completed At", "Priority", "Notes")
 	caser := cases.Title(language.English)
 	for index, t := range displayTodos {
 		completed := "No"
@@ -114,7 +116,7 @@ func (todos *Todos) Print(sortByPriority bool) {
 				completedAt = t.CompletedAt.Format(time.RFC1123)
 			}
 		}
-		table.AddRow(strconv.Itoa(index), t.Title, completed, t.CreatedAt.Format(time.RFC1123), completedAt, caser.String(t.Priority))
+		table.AddRow(strconv.Itoa(index), t.Title, completed, t.CreatedAt.Format(time.RFC1123), completedAt, caser.String(t.Priority), t.Notes)
 	}
 	table.Render()
 
