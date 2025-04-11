@@ -2,8 +2,8 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -41,7 +41,6 @@ func (todos *Todos) Add(title string, priority string) {
 		Priority:    priority,
 	}
 	*todos = append(*todos, todo)
-	fmt.Printf("Added todo: %s with priority: %s\n", title, priority)
 }
 
 func (todos *Todos) validateIndex(index int) error {
@@ -87,12 +86,26 @@ func (todos *Todos) Edit(index int, title string) error {
 	return nil
 }
 
-func (todos *Todos) Print() {
+func (todos *Todos) Print(sortByPriority bool) {
+	// create a copy of the todos slice to avoid modifying the original slice
+	displayTodos := make(Todos, len(*todos))
+	copy(displayTodos, *todos)
+	// sort the todos slice by priority
+	if sortByPriority {
+		sortBy := map[string]int{
+			"high":   3,
+			"medium": 2,
+			"low":    1,
+		}
+		sort.Slice(displayTodos, func(i, j int) bool {
+			return sortBy[strings.ToLower(displayTodos[i].Priority)] > sortBy[strings.ToLower(displayTodos[j].Priority)]
+		})
+	}
 	table := table.New(os.Stdout)
 	table.SetRowLines(false)
 	table.SetHeaders("Index", "Title", "Completed", "Created At", "Completed At", "Priority")
 	caser := cases.Title(language.English)
-	for index, t := range *todos {
+	for index, t := range displayTodos {
 		completed := "No"
 		completedAt := ""
 		if t.Completed {
@@ -101,7 +114,6 @@ func (todos *Todos) Print() {
 				completedAt = t.CompletedAt.Format(time.RFC1123)
 			}
 		}
-		fmt.Printf("Index: %d, Priority: %s\n", index, caser.String(t.Priority))
 		table.AddRow(strconv.Itoa(index), t.Title, completed, t.CreatedAt.Format(time.RFC1123), completedAt, caser.String(t.Priority))
 	}
 	table.Render()

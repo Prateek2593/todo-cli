@@ -15,6 +15,7 @@ type CmdFlags struct {
 	Toggle   int
 	List     bool
 	Priority string
+	Sort     bool
 }
 
 func NewCmdFlags() *CmdFlags {
@@ -26,6 +27,7 @@ func NewCmdFlags() *CmdFlags {
 	flag.IntVar(&cf.Toggle, "toggle", -1, "Specify a todo by index to toggle")
 	flag.BoolVar(&cf.List, "list", false, "List all todos")
 	flag.StringVar(&cf.Priority, "p", "medium", "Specify a priority for a todo")
+	flag.BoolVar(&cf.Sort, "sort", false, "Sort todos by priority")
 
 	flag.Parse()
 
@@ -36,7 +38,7 @@ func NewCmdFlags() *CmdFlags {
 func (cf *CmdFlags) Execute(todos *Todos) {
 	switch {
 	case cf.List:
-		todos.Print()
+		todos.Print(cf.Sort)
 	case cf.Add != "":
 		todos.Add(cf.Add, cf.Priority)
 	case cf.Edit != "":
